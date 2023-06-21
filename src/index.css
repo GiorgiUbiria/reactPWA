@@ -83,6 +83,11 @@ button {
   width: 100vw;
 }
 
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
 /* ========= Grid ========================= */
 .grid {
   gap: 1.25rem;
@@ -99,6 +104,10 @@ button {
 }
 
 .grid.hard {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.grid.extreme {
   grid-template-columns: repeat(6, 1fr);
 }
 
@@ -189,14 +198,50 @@ button {
 }
 
 .difficulty-button {
-  width: 25%;
+  width: 20%;
   background-color: #202426;
   color: white;
+  cursor: pointer;
 }
 
 .difficulty-button:hover {
   scale: 1.1;
   transition: 0.1s;
+}
+
+/* ========= Timer ===================== */
+.timer {
+  margin-top: 2.5rem;
+  display: flex;
+}
+
+.timer-header {
+  color: white;
+}
+
+.seconds {
+  color: blue;
+}
+
+/* ========= Pop up ===================== */
+.extreme-popup {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: whitesmoke;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.extreme-warning {
+  color: crimson;
+}
+
+.extreme-text {
+  color: black;
 }
 
 /* ========= Mobile ===================== */
