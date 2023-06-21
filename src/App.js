@@ -10,7 +10,13 @@ function App() {
   const [pickOne, setPickOne] = useState(null);
   const [pickTwo, setPickTwo] = useState(null);
   const [disabled, setDisabled] = useState(false);
-  const [setBadge, clearBadge] = useAppBadge();
+  const [difficulty, setDifficulty] = useState('easy'); // Track difficulty mode
+
+  const difficulties = {
+    easy: { cardsCount: 6 },
+    medium: { cardsCount: 12 },
+    hard: { cardsCount: 16 },
+  };
 
   const handleClick = (card) => {
     if (!disabled) {
@@ -28,7 +34,11 @@ function App() {
     setWins(0);
     clearBadge();
     handleTurn();
-    setCards(shuffle());
+    setCards(shuffle(difficulties[difficulty].cardsCount));
+  };
+
+  const handleDifficultyChange = (newDifficulty) => {
+    setDifficulty(newDifficulty);
   };
 
   useEffect(() => {
@@ -67,17 +77,22 @@ function App() {
       setWins((prevWins) => prevWins + 1);
       setBadge();
       handleTurn();
-      setCards(shuffle());
+      setCards(shuffle(difficulties[difficulty].cardsCount)); // Use difficulty to determine card count
     }
   }, [cards, setBadge]);
 
   useEffect(() => {
-    setCards(shuffle());
-  }, []);
+    setCards(shuffle(difficulties[difficulty].cardsCount)); // Use difficulty to determine card count
+  }, [difficulty]);
 
   return (
     <>
-      <Header handleNewGame={handleNewGame} wins={wins} />
+      <Header
+        handleNewGame={handleNewGame}
+        wins={wins}
+        difficulty={difficulty}
+        onDifficultyChange={handleDifficultyChange}
+      />
       <div className="grid">
         {cards.map((card) => {
           const { image, matched } = card;

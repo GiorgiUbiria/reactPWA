@@ -1,4 +1,4 @@
-const shuffle = () => {
+const shuffle = (cardsCount) => {
   const assets = [
     { image: '/assets/css.png' },
     { image: '/assets/html.png' },
@@ -11,6 +11,7 @@ const shuffle = () => {
   ];
   return [...assets, ...assets]
     .sort(() => Math.random() - 0.5)
+    .slice(0, cardsCount)
     .map((card) => ({ ...card, id: Math.random() }));
 };
 
