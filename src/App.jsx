@@ -33,22 +33,22 @@ function App() {
     if (gameOver) {
       return;
     }
-  
+
     if (!disabled) {
       pickOne ? setPickTwo(card) : setPickOne(card);
     }
   }, [gameOver, disabled, pickOne]);
-  
+
   const handleTimer = useCallback(() => {
     setTimer((prevTimer) => prevTimer - 1);
   }, []);
-  
+
   const handleTurn = useCallback(() => {
     setPickOne(null);
     setPickTwo(null);
     setDisabled(false);
   }, []);
-  
+
   const handleNewGame = useCallback(() => {
     setWins(0);
     handleTurn();
@@ -59,11 +59,11 @@ function App() {
     setGameOver(false);
     clearBadge();
   }, [handleTurn, clearBadge]);
-  
+
   const handleDifficultyChange = useCallback((newDifficulty) => {
     setDifficulty(newDifficulty);
     setShowDifficultyModal(false);
-  
+
     if (newDifficulty === "extreme") {
       setTimer(60);
       setGameOver(false);
@@ -125,7 +125,7 @@ function App() {
 
   useEffect(() => {
     const hasUnmatchedCard = cards.some((card) => !card.matched);
-  
+
     if (cards.length && !hasUnmatchedCard) {
       setWins((prevWins) => prevWins + 1);
       handleTurn();

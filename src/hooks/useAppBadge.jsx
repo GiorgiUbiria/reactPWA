@@ -1,25 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const useAppBadge = () => {
-  const [counter, setCounter] = useState(1);
+  const [counter, setCounter] = useState(0);
 
   const setBadge = () => {
-    setCounter((prevCounter) => prevCounter + 1);
-    if (navigator.setAppBadge) {
-      navigator.setAppBadge(counter);
-    } else if (navigator.setClientBadge) {
-      navigator.setClientBadge();
-    }
+    const newCounter = counter + 1;
+    setCounter(newCounter);
+    updateBadge(newCounter);
   };
 
   const clearBadge = () => {
-    setCounter(1);
-    if (navigator.clearAppBadge) {
-      navigator.clearAppBadge();
-    } else if (navigator.clearClientBadge) {
-      navigator.clearClientBadge();
+    setCounter(0);
+    updateBadge(0);
+  };
+
+  const updateBadge = (count) => {
+    if (navigator.setAppBadge) {
+      navigator.setAppBadge(count);
+    } else if (navigator.setClientBadge) {
+      navigator.setClientBadge({ count });
     }
   };
+
+  useEffect(() => {
+    if (counter > 0) {
+      updateBadge(counter);
+    }
+  }, [counter]);
 
   return [setBadge, clearBadge];
 };
