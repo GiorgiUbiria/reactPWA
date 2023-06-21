@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Card from './components/Card';
 import Header from './components/Header';
-import useAppBadge from './hooks/useAppBadge';
 import shuffle from './utilities/shuffle';
 
 function App() {
@@ -10,13 +9,13 @@ function App() {
   const [pickOne, setPickOne] = useState(null);
   const [pickTwo, setPickTwo] = useState(null);
   const [disabled, setDisabled] = useState(false);
-  const [difficulty, setDifficulty] = useState('easy'); // Track difficulty mode
+  const [difficulty, setDifficulty] = useState('easy');
 
-  const difficulties = {
+  const difficulties = useMemo(() => ({
     easy: { cardsCount: 6 },
     medium: { cardsCount: 12 },
     hard: { cardsCount: 16 },
-  };
+  }), []);
 
   const handleClick = (card) => {
     if (!disabled) {
@@ -32,7 +31,6 @@ function App() {
 
   const handleNewGame = () => {
     setWins(0);
-    clearBadge();
     handleTurn();
     setCards(shuffle(difficulties[difficulty].cardsCount));
   };
@@ -75,15 +73,14 @@ function App() {
     if (cards.length && checkWin.length < 1) {
       console.log('You win!');
       setWins((prevWins) => prevWins + 1);
-      setBadge();
       handleTurn();
-      setCards(shuffle(difficulties[difficulty].cardsCount)); // Use difficulty to determine card count
+      setCards(shuffle(difficulties[difficulty].cardsCount));
     }
-  }, [cards, setBadge]);
+  }, [cards, difficulties, difficulty]);
 
   useEffect(() => {
-    setCards(shuffle(difficulties[difficulty].cardsCount)); // Use difficulty to determine card count
-  }, [difficulty]);
+    setCards(shuffle(difficulties[difficulty].cardsCount));
+  }, [difficulties, difficulty]);
 
   return (
     <>
