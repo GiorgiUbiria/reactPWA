@@ -1,19 +1,20 @@
 {
-  "short_name": "Manifest",
-  "name": "Manifest Game",
+  "short_name": "Programming Memory Game",
+  "name": "Programming Memory Game",
+  "description": "A fun memory game for programming enthusiasts",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "main-logo.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "main-logo192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "main-logo512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
@@ -21,5 +22,11 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["games"],
+  "prefer_related_applications": false,
+  "related_applications": []
 }

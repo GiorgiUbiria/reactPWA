@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Card from './components/Card';
 import Header from './components/Header';
 import DifficultyModal from './components/DifficultyModal';
@@ -12,7 +12,7 @@ function App() {
   const [disabled, setDisabled] = useState(false);
   const [difficulty, setDifficulty] = useState(null);
   const [showDifficultyModal, setShowDifficultyModal] = useState(true);
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(60);
   const [gameOver, setGameOver] = useState(false);
 
   const difficulties = useMemo(
@@ -25,45 +25,45 @@ function App() {
     []
   );
 
-  const handleClick = (card) => {
+  const handleClick = useCallback((card) => {
     if (gameOver) {
       return;
     }
-
+  
     if (!disabled) {
       pickOne ? setPickTwo(card) : setPickOne(card);
     }
-  };
-
-  const handleTimer = () => {
+  }, [gameOver, disabled, pickOne]);
+  
+  const handleTimer = useCallback(() => {
     setTimer((prevTimer) => prevTimer - 1);
-  };
-
-  const handleTurn = () => {
+  }, []);
+  
+  const handleTurn = useCallback(() => {
     setPickOne(null);
     setPickTwo(null);
     setDisabled(false);
-  };
-
-  const handleNewGame = () => {
+  }, []);
+  
+  const handleNewGame = useCallback(() => {
     setWins(0);
     handleTurn();
     setDifficulty(null);
     setShowDifficultyModal(true);
     setCards([]);
-    setTimer(10);
+    setTimer(60);
     setGameOver(false);
-  };
-
-  const handleDifficultyChange = (newDifficulty) => {
+  }, [handleTurn]);
+  
+  const handleDifficultyChange = useCallback((newDifficulty) => {
     setDifficulty(newDifficulty);
     setShowDifficultyModal(false);
-
+  
     if (newDifficulty === "extreme") {
-      setTimer(10);
+      setTimer(60);
       setGameOver(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (difficulty) {
@@ -88,7 +88,7 @@ function App() {
     return () => {
       clearInterval(intervalId);
     };
-  }, [difficulty, gameOver, timer]);
+  }, [difficulty, gameOver, handleTimer, timer]);
 
   useEffect(() => {
     let pickTimer;
@@ -116,18 +116,17 @@ function App() {
     return () => {
       clearTimeout(pickTimer);
     };
-  }, [pickOne, pickTwo]);
+  }, [handleTurn, pickOne, pickTwo]);
 
   useEffect(() => {
-    const checkWin = cards.filter((card) => !card.matched);
-
-    if (cards.length && checkWin.length < 1) {
-      console.log('You win!');
+    const hasUnmatchedCard = cards.some((card) => !card.matched);
+  
+    if (cards.length && !hasUnmatchedCard) {
       setWins((prevWins) => prevWins + 1);
       handleTurn();
-      setCards(shuffle(difficulties[difficulty].cardsCount));
+      setCards((prevCards) => shuffle(prevCards.length));
     }
-  }, [cards, difficulties, difficulty]);
+  }, [cards, difficulty, handleTurn]);  
 
   return (
     <div className="main-body">
