@@ -3,6 +3,7 @@ import Card from './components/Card';
 import Header from './components/Header';
 import DifficultyModal from './components/DifficultyModal';
 import shuffle from './utilities/shuffle';
+import useAppBadge from './hooks/useAppBadge';
 
 function App() {
   const [wins, setWins] = useState(0);
@@ -14,6 +15,7 @@ function App() {
   const [showDifficultyModal, setShowDifficultyModal] = useState(true);
   const [timer, setTimer] = useState(60);
   const [gameOver, setGameOver] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   const difficulties = useMemo(
     () => ({
@@ -24,6 +26,8 @@ function App() {
     }),
     []
   );
+
+  const [setBadge, clearBadge] = useAppBadge();
 
   const handleClick = useCallback((card) => {
     if (gameOver) {
@@ -53,7 +57,8 @@ function App() {
     setCards([]);
     setTimer(60);
     setGameOver(false);
-  }, [handleTurn]);
+    clearBadge();
+  }, [handleTurn, clearBadge]);
   
   const handleDifficultyChange = useCallback((newDifficulty) => {
     setDifficulty(newDifficulty);
@@ -125,8 +130,21 @@ function App() {
       setWins((prevWins) => prevWins + 1);
       handleTurn();
       setCards((prevCards) => shuffle(prevCards.length));
+      setBadge();
     }
-  }, [cards, difficulty, handleTurn]);  
+  }, [cards, difficulty, handleTurn, setBadge]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
     <div className="main-body">
@@ -164,6 +182,7 @@ function App() {
         <DifficultyModal
           difficulties={difficulties}
           onDifficultyChange={handleDifficultyChange}
+          screenWidth={screenWidth}
         />
       )}
     </div>

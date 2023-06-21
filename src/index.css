@@ -103,13 +103,13 @@ button {
   grid-template-columns: repeat(4, 1fr);
 }
 
-.grid.hard {
-  grid-template-columns: repeat(6, 1fr);
-}
-
+.grid.hard,
 .grid.extreme {
   grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  margin: 3rem auto 1.5rem auto;
 }
+
 
 /* ========= Card ========================= */
 .card {
@@ -189,6 +189,7 @@ button {
   box-shadow: 0px 2px 4px black;
   border-radius: 10px;
   padding: 10px;
+  animation: var(--card-enter);
 }
 
 .difficulty-buttons {
@@ -207,6 +208,18 @@ button {
 .difficulty-button:hover {
   scale: 1.1;
   transition: 0.1s;
+}
+
+.difficulty-button:disabled {
+  background-color: rgb(116, 116, 116);
+  pointer-events: none;
+}
+
+.mobile-message {
+  display: none;
+  font-size: 12px;
+  color: red;
+  margin-top: 5px;
 }
 
 /* ========= Timer ===================== */
@@ -248,21 +261,39 @@ button {
 @media screen and (max-width: 720px) {
   body {
     align-items: center;
+    flex-direction: column;
   }
 
   header {
-    left: 0;
     bottom: 0;
     margin: auto;
+    width: 100%;
     position: fixed;
     border-radius: 0;
+    text-align: center;
+  }
+
+  .modal {
+    width: 90%;
+  }
+
+  .difficulty-buttons {
+    width: 100%;
   }
 
   .grid {
     margin: auto auto 3rem auto;
   }
 
+  .grid.easy {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
   .card {
     width: var(--card-width-mobile);
+  }
+
+  .mobile-message {
+    display: block;
   }
 }
