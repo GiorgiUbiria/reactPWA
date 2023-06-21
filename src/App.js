@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Card from './components/Card';
 import Header from './components/Header';
+import DifficultyModal from './components/DifficultyModal';
 import shuffle from './utilities/shuffle';
 
 function App() {
@@ -9,13 +10,17 @@ function App() {
   const [pickOne, setPickOne] = useState(null);
   const [pickTwo, setPickTwo] = useState(null);
   const [disabled, setDisabled] = useState(false);
-  const [difficulty, setDifficulty] = useState('easy');
+  const [difficulty, setDifficulty] = useState(null);
+  const [showDifficultyModal, setShowDifficultyModal] = useState(true);
 
-  const difficulties = useMemo(() => ({
-    easy: { cardsCount: 6 },
-    medium: { cardsCount: 12 },
-    hard: { cardsCount: 16 },
-  }), []);
+  const difficulties = useMemo(
+    () => ({
+      easy: { cardsCount: 12 },
+      medium: { cardsCount: 16 },
+      hard: { cardsCount: 24 },
+    }),
+    []
+  );
 
   const handleClick = (card) => {
     if (!disabled) {
@@ -32,12 +37,21 @@ function App() {
   const handleNewGame = () => {
     setWins(0);
     handleTurn();
-    setCards(shuffle(difficulties[difficulty].cardsCount));
+    setDifficulty(null);
+    setShowDifficultyModal(true);
+    setCards([]);
   };
-
+  
   const handleDifficultyChange = (newDifficulty) => {
     setDifficulty(newDifficulty);
+    setShowDifficultyModal(false);
   };
+
+  useEffect(() => {
+    if (difficulty) {
+      setCards(shuffle(difficulties[difficulty].cardsCount));
+    }
+  }, [difficulties, difficulty]);
 
   useEffect(() => {
     let pickTimer;
@@ -78,19 +92,10 @@ function App() {
     }
   }, [cards, difficulties, difficulty]);
 
-  useEffect(() => {
-    setCards(shuffle(difficulties[difficulty].cardsCount));
-  }, [difficulties, difficulty]);
-
   return (
-    <>
-      <Header
-        handleNewGame={handleNewGame}
-        wins={wins}
-        difficulty={difficulty}
-        onDifficultyChange={handleDifficultyChange}
-      />
-      <div className="grid">
+    <div className="main-body">
+      <Header handleNewGame={handleNewGame} wins={wins} difficulty={difficulty} />
+      <div className={`grid ${difficulty}`}>
         {cards.map((card) => {
           const { image, matched } = card;
 
@@ -105,7 +110,13 @@ function App() {
           );
         })}
       </div>
-    </>
+      {showDifficultyModal && (
+        <DifficultyModal
+          difficulties={difficulties}
+          onDifficultyChange={handleDifficultyChange}
+        />
+      )}
+    </div>
   );
 }
 
