@@ -2,8 +2,15 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import Card from './components/Card';
 import Header from './components/Header';
 import DifficultyModal from './components/DifficultyModal';
+import CategoryModal from './components/CategoryModal';
 import shuffle from './utilities/shuffle';
 import useAppBadge from './hooks/useAppBadge';
+
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
+
+library.add(fas, faLightbulb)
 
 function App() {
   const [wins, setWins] = useState(0);
@@ -16,16 +23,22 @@ function App() {
   const [timer, setTimer] = useState(60);
   const [gameOver, setGameOver] = useState(false);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [category, setCategory] = useState(null);
+  const [showCategoryModal, setShowCategoryModal] = useState(true);
+  const [showHint, setShowHint] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
 
   const difficulties = useMemo(
     () => ({
       easy: { cardsCount: 12 },
       medium: { cardsCount: 16 },
-      hard: { cardsCount: 24 },
-      extreme: { cardsCount: 24 },
+      hard: { cardsCount: 20 },
+      extreme: { cardsCount: 20 },
     }),
     []
   );
+
+  const categories = ['Web Development', 'Databases', 'Programming Languages', 'Programming Tools'];
 
   const [setBadge, clearBadge] = useAppBadge();
 
@@ -53,7 +66,8 @@ function App() {
     setWins(0);
     handleTurn();
     setDifficulty(null);
-    setShowDifficultyModal(true);
+    setCategory(null);
+    setShowCategoryModal(true);
     setCards([]);
     setTimer(60);
     setGameOver(false);
@@ -70,11 +84,44 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    if (difficulty) {
-      setCards(shuffle(difficulties[difficulty].cardsCount));
+  const handleCategoryChange = useCallback((newCategory) => {
+    setCategory(newCategory);
+    setShowCategoryModal(false);
+  }, []);
+
+  const toggleHint = useCallback(() => {
+    if (!hintUsed) {
+      setShowHint((prevShowHint) => !prevShowHint);
+      setHintUsed(true);
     }
-  }, [difficulties, difficulty]);
+  }, [hintUsed]);
+
+  useEffect(() => {
+    if (showHint) {
+      const unmatchedCards = cards.filter((card) => !card.matched);
+      const randomIndexOne = Math.floor(Math.random() * unmatchedCards.length);
+      let randomIndexTwo = Math.floor(Math.random() * unmatchedCards.length);
+
+      while (randomIndexTwo === randomIndexOne) {
+        randomIndexTwo = Math.floor(Math.random() * unmatchedCards.length);
+      }
+
+      const hintCardOne = unmatchedCards[randomIndexOne];
+      const hintCardTwo = unmatchedCards[randomIndexTwo];
+
+      setPickOne(hintCardOne);
+      setPickTwo(hintCardTwo);
+    } else {
+      setPickOne(null);
+      setPickTwo(null);
+    }
+  }, [showHint, cards]);
+
+  useEffect(() => {
+    if (difficulty && category) {
+      setCards(shuffle(difficulties[difficulty].cardsCount, category));
+    }
+  }, [difficulties, difficulty, category]);
 
   useEffect(() => {
     let intervalId;
@@ -148,42 +195,49 @@ function App() {
 
   return (
     <div className="main-body">
-      <Header handleNewGame={handleNewGame} wins={wins} difficulty={difficulty} />
-      {!gameOver && difficulty === "extreme" && (
-        <div className="timer">
-          <h3 className="timer-header">
-            Time Remaining:  <span className="seconds"> {timer} </span> seconds
-          </h3>
-        </div>
+      {showCategoryModal && (
+        <CategoryModal categories={categories} onCategoryChange={handleCategoryChange} />
       )}
-      {gameOver && difficulty === "extreme" && (
-        <div className="extreme-popup">
-          <h2 className="extreme-warning">Game Over!</h2>
-          <p className="extreme-text">You failed the EXTREME level.</p>
-        </div>
-      )}
-      <div className={`grid ${difficulty}`}>
-        {cards.map((card) => {
-          const { image, matched } = card;
+      {category && (
+        <>
+          <Header handleNewGame={handleNewGame} wins={wins} difficulty={difficulty} showHint={showHint} toggleHint={toggleHint} hintUsed={hintUsed} />
+          {!gameOver && difficulty === "extreme" && (
+            <div className="timer">
+              <h3 className="timer-header">
+                Time Remaining:  <span className="seconds"> {timer} </span> seconds
+              </h3>
+            </div>
+          )}
+          {gameOver && difficulty === "extreme" && (
+            <div className="extreme-popup">
+              <h2 className="extreme-warning">Game Over!</h2>
+              <p className="extreme-text">You failed the EXTREME level.</p>
+            </div>
+          )}
+          <div className={`grid ${difficulty}`}>
+            {cards.map((card) => {
+              const { image, matched } = card;
 
-          return (
-            <Card
-              key={card.id}
-              card={card}
-              image={image}
-              onClick={() => handleClick(card)}
-              selected={card === pickOne || card === pickTwo || matched}
-              className={gameOver && difficulty === "extreme" ? "disabled" : ""}
+              return (
+                <Card
+                  key={card.id}
+                  card={card}
+                  image={image}
+                  onClick={() => handleClick(card)}
+                  selected={card === pickOne || card === pickTwo || matched}
+                  className={gameOver && difficulty === "extreme" ? "disabled" : ""}
+                />
+              );
+            })}
+          </div>
+          {showDifficultyModal && (
+            <DifficultyModal
+              difficulties={difficulties}
+              onDifficultyChange={handleDifficultyChange}
+              screenWidth={screenWidth}
             />
-          );
-        })}
-      </div>
-      {showDifficultyModal && (
-        <DifficultyModal
-          difficulties={difficulties}
-          onDifficultyChange={handleDifficultyChange}
-          screenWidth={screenWidth}
-        />
+          )}
+        </>
       )}
     </div>
   );

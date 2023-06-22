@@ -1,23 +1,17 @@
-const shuffle = (cardsCount) => {
+const shuffle = (cardsCount, category) => {
   const assets = [
-    { image: '/assets/css.png' },
-    { image: '/assets/html.png' },
-    { image: '/assets/dotnet.png' },
-    { image: '/assets/js.png' },
-    { image: '/assets/nextjs.png' },
-    { image: '/assets/sass.png' },
-    { image: '/assets/vscode.png' },
-    { image: '/assets/tailwind.png' },
-    { image: '/assets/mysql.png' },
-    { image: '/assets/laravel.png' },
-    { image: '/assets/vue.png' },
-    { image: '/assets/nestjs.png' },
-    { image: '/assets/angular.png' },
-    { image: '/assets/vite.png' },
-    { image: '/assets/nodejs.png' },
-    { image: '/assets/react.png' },
-    { image: '/assets/postgress.png' },
-    { image: '/assets/oracle.png' },
+    { image: `/assets/${category}/card-1.png` },
+    { image: `/assets/${category}/card-2.png` },
+    { image: `/assets/${category}/card-3.png` },
+    { image: `/assets/${category}/card-4.png` },
+    { image: `/assets/${category}/card-5.png` },
+    { image: `/assets/${category}/card-6.png` },
+    { image: `/assets/${category}/card-7.png` },
+    { image: `/assets/${category}/card-8.png` },
+    { image: `/assets/${category}/card-9.png` },
+    { image: `/assets/${category}/card-10.png` },
+    { image: `/assets/${category}/card-11.png` },
+    { image: `/assets/${category}/card-12.png` },
   ];
 
   const availableCards = [...assets];
