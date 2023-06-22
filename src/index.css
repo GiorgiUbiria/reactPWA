@@ -76,6 +76,14 @@ button {
   margin: auto;
 }
 
+.new-game-btn {
+  cursor: pointer;
+}
+
+.new-game-btn:hover {
+  scale: 1.03;
+}
+
 .main-body {
   display: flex;
   flex-direction: column;
@@ -226,7 +234,7 @@ button {
 }
 
 .difficulty-button:hover {
-  scale: 1.1;
+  scale: 1.05;
   transition: 0.1s;
 }
 

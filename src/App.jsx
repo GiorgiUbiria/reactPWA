@@ -6,6 +6,10 @@ import CategoryModal from './components/CategoryModal';
 import shuffle from './utilities/shuffle';
 import useAppBadge from './hooks/useAppBadge';
 
+import cardFlip from './sounds/cardFlip.mp3';
+import easyMediumBackground from './sounds/easyMediumBackground.mp3';
+import hardExtremeBackground from './sounds/hardExtremeBackground.mp3';
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
@@ -27,6 +31,9 @@ function App() {
   const [showCategoryModal, setShowCategoryModal] = useState(true);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
+  const [cardFlipAudio] = useState(new Audio(cardFlip));
+  const [easyMediumBackgroundAudio] = useState(new Audio(easyMediumBackground));
+  const [hardExtremeBackgroundAudio] = useState(new Audio(hardExtremeBackground));
 
   const difficulties = useMemo(
     () => ({
@@ -49,8 +56,9 @@ function App() {
 
     if (!disabled) {
       pickOne ? setPickTwo(card) : setPickOne(card);
+      cardFlipAudio.play();
     }
-  }, [gameOver, disabled, pickOne]);
+  }, [gameOver, disabled, pickOne, cardFlipAudio]);
 
   const handleTimer = useCallback(() => {
     setTimer((prevTimer) => prevTimer - 1);
@@ -60,19 +68,26 @@ function App() {
     setPickOne(null);
     setPickTwo(null);
     setDisabled(false);
+    setShowHint(false);
   }, []);
 
   const handleNewGame = useCallback(() => {
     setWins(0);
-    handleTurn();
     setDifficulty(null);
     setCategory(null);
     setShowCategoryModal(true);
+    setShowDifficultyModal(true);
     setCards([]);
+    setShowHint(true);
+    handleTurn();
     setTimer(60);
     setGameOver(false);
     clearBadge();
-  }, [handleTurn, clearBadge]);
+    easyMediumBackgroundAudio.pause();
+    easyMediumBackgroundAudio.currentTime = 0;
+    hardExtremeBackgroundAudio.pause();
+    hardExtremeBackgroundAudio.currentTime = 0;
+  }, [handleTurn, clearBadge, easyMediumBackgroundAudio, hardExtremeBackgroundAudio]);
 
   const handleDifficultyChange = useCallback((newDifficulty) => {
     setDifficulty(newDifficulty);
@@ -120,8 +135,18 @@ function App() {
   useEffect(() => {
     if (difficulty && category) {
       setCards(shuffle(difficulties[difficulty].cardsCount, category));
+      setShowDifficultyModal(false);
+
+      if (difficulty === 'easy' || difficulty === 'medium') {
+        easyMediumBackgroundAudio.currentTime = 0;
+        easyMediumBackgroundAudio.play();
+        hardExtremeBackgroundAudio.pause();
+      } else {
+        easyMediumBackgroundAudio.pause();
+        hardExtremeBackgroundAudio.play();
+      }
     }
-  }, [difficulties, difficulty, category]);
+  }, [difficulties, difficulty, category, setShowDifficultyModal, easyMediumBackgroundAudio, hardExtremeBackgroundAudio]);
 
   useEffect(() => {
     let intervalId;
@@ -192,6 +217,15 @@ function App() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (difficulty !== 'easy' && difficulty !== 'medium') {
+        hardExtremeBackgroundAudio.pause();
+        hardExtremeBackgroundAudio.currentTime = 0;
+      }
+    };
+  }, [difficulty, hardExtremeBackgroundAudio]);
 
   return (
     <div className="main-body">

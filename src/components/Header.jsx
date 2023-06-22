@@ -13,7 +13,7 @@ const Header = ({ handleNewGame, wins, difficulty, showHint, toggleHint, hintUse
       <h4>{wins} wins</h4>
       <h3>Memory Game</h3>
       {memoizedDifficulty && <h3>Current difficulty: {memoizedDifficulty}</h3>}
-      <button onClick={handleNewGame}>New Game</button>
+      <button onClick={handleNewGame} className='new-game-btn'>New Game</button>
       {difficulty === "hard" || difficulty === "extreme" ? (
         <button
           onClick={toggleHint}
