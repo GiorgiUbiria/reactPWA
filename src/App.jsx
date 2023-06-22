@@ -6,13 +6,13 @@ import CategoryModal from './components/CategoryModal';
 import shuffle from './utilities/shuffle';
 import useAppBadge from './hooks/useAppBadge';
 
-import cardFlip from './sounds/cardFlip.mp3';
-import easyMediumBackground from './sounds/easyMediumBackground.mp3';
-import hardExtremeBackground from './sounds/hardExtremeBackground.mp3';
-
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
+
+const cardFlip = new Audio(process.env.PUBLIC_URL + '/sounds/cardFlip.mp3');
+const easyMediumBackground = new Audio(process.env.PUBLIC_URL + '/sounds/easyMediumBackground.mp3');
+const hardExtremeBackground = new Audio(process.env.PUBLIC_URL + '/sounds/hardExtremeBackground.mp3');
 
 library.add(fas, faLightbulb)
 
@@ -31,9 +31,9 @@ function App() {
   const [showCategoryModal, setShowCategoryModal] = useState(true);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
-  const [cardFlipAudio] = useState(new Audio(cardFlip));
-  const [easyMediumBackgroundAudio] = useState(new Audio(easyMediumBackground));
-  const [hardExtremeBackgroundAudio] = useState(new Audio(hardExtremeBackground));
+  const [cardFlipAudio] = useState(cardFlip);
+  const [easyMediumBackgroundAudio] = useState(easyMediumBackground);
+  const [hardExtremeBackgroundAudio] = useState(hardExtremeBackground);
 
   const difficulties = useMemo(
     () => ({
