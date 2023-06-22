@@ -317,6 +317,19 @@ button {
     width: 90%;
   }
 
+  .category-modal {
+    width: 90%;
+  }
+
+  .category-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .category-button {
+    width: 80%;
+  }
+
   .difficulty-buttons {
     width: 100%;
   }
