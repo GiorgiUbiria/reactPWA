@@ -5,14 +5,7 @@ const DifficultyModal = ({ difficulties, onDifficultyChange }) => {
 
   const handleButtonClick = useCallback(
     (level) => {
-      if (window.innerWidth <= 720 && (level === 'hard' || level === 'extreme')) {
-        modalRef.current.classList.add('show-message');
-        setTimeout(() => {
-          modalRef.current.classList.remove('show-message');
-        }, 2000);
-      } else {
-        onDifficultyChange(level);
-      }
+      onDifficultyChange(level);
     },
     [onDifficultyChange]
   );
@@ -24,7 +17,6 @@ const DifficultyModal = ({ difficulties, onDifficultyChange }) => {
           key={level}
           onClick={() => handleButtonClick(level)}
           className="difficulty-button"
-          disabled={window.innerWidth <= 720 && (level === 'hard' || level === 'extreme')}
         >
           {level}
         </button>
@@ -39,7 +31,7 @@ const DifficultyModal = ({ difficulties, onDifficultyChange }) => {
         {difficultyButtons}
       </div>
       {window.innerWidth <= 720 && (
-        <p className="mobile-message">Hard and Extreme difficulties are not available on mobile yet!</p>
+        <p className="mobile-message">Hard and Extreme difficulties are not yet optimized. Play at your own risk!</p>
       )}
     </div>
   );

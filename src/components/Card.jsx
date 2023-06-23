@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-const Card = ({ image, selected, onClick }) => {
+const Card = ({ image, selected, onClick, dificulty }) => {
   const memoizedImage = useMemo(() => image, [image]);
 
   return (

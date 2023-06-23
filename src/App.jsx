@@ -259,6 +259,7 @@ function App() {
                   image={image}
                   onClick={() => handleClick(card)}
                   selected={card === pickOne || card === pickTwo || matched}
+                  difficulty={difficulty}
                   className={gameOver && difficulty === "extreme" ? "disabled" : ""}
                 />
               );
