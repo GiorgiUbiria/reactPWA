@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
-
-type NavigatorWithBadge = Navigator & {
-  setAppBadge?: (count: number) => void;
-  setClientBadge?: ({ count }: { count: number }) => void;
-};
+import { NavigatorWithBadge } from '../types/badgeType';
 
 const useAppBadge = (): [() => void, () => void] => {
   const [counter, setCounter] = useState(0);
