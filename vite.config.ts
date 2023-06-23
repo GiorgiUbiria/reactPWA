@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react-swc'
 
 const manifestForPlugin: Partial<VitePWAOptions> = {
   registerType: "prompt",
-  includeAssets: [],
+  includeAssets: ["main-logo.ico", "favicon.ico"],
   manifest: {
     "name": "Programming Memory Game",
     "short_name": "Programming Memory Game",
