@@ -1,9 +1,15 @@
-import React, { useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef, useCallback } from 'react';
+import { CategoryType } from '../types/categoryType';
 
-const CategoryModal = ({ categories, onCategoryChange }) => {
+type CategoryModalProps = {
+  categories: CategoryType[];
+  onCategoryChange: (category: CategoryType) => void;
+};
+
+const CategoryModal:  React.FC<CategoryModalProps> = ({ categories, onCategoryChange }) => {
   const modalRef = useRef(null);
 
-  const handleButtonClick = useCallback((category) => {
+  const handleButtonClick = useCallback((category: CategoryType) => {
     onCategoryChange(category);
   }, [onCategoryChange]);
 

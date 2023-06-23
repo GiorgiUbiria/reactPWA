@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 
-const useAppBadge = () => {
+type NavigatorWithBadge = Navigator & {
+  setAppBadge?: (count: number) => void;
+  setClientBadge?: ({ count }: { count: number }) => void;
+};
+
+const useAppBadge = (): [() => void, () => void] => {
   const [counter, setCounter] = useState(0);
 
   const setBadge = () => {
@@ -14,11 +19,13 @@ const useAppBadge = () => {
     updateBadge(0);
   };
 
-  const updateBadge = (count) => {
-    if (navigator.setAppBadge) {
-      navigator.setAppBadge(count);
-    } else if (navigator.setClientBadge) {
-      navigator.setClientBadge({ count });
+  const updateBadge = (count: number) => {
+    const navigatorWithBadge = navigator as NavigatorWithBadge;
+
+    if (navigatorWithBadge.setAppBadge) {
+      navigatorWithBadge.setAppBadge(count);
+    } else if (navigatorWithBadge.setClientBadge) {
+      navigatorWithBadge.setClientBadge({ count });
     }
   };
 
