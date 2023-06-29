@@ -4,17 +4,26 @@ interface CardProps {
   image: string;
   onClick: () => void;
   selected: boolean;
-  className: string;
+  blindfolded: boolean;
 }
 
-const Card: React.FC<CardProps> = ({ image, selected, onClick}) => {
+const Card: React.FC<CardProps> = ({
+  image,
+  selected,
+  onClick,
+  blindfolded,
+}) => {
   const memoizedImage = useMemo(() => image, [image]);
 
   return (
     <div className="card">
       <div className={selected ? "selected" : ""}>
         <div className="card-face">
-          <img alt="" src={memoizedImage} className="card-image" />
+          {blindfolded ? (
+            <img src="/assets/blindfolded.png" alt="Blindfolded" />
+          ) : (
+            <img alt="Image" src={memoizedImage} className="card-image" />
+          )}
         </div>
         <div className="card-back" onClick={onClick}>
           <img alt="" src="/logo.png" className="card-image" />

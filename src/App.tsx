@@ -13,7 +13,9 @@ import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
 import { CardType } from './types/cardType';
 import { DifficultyType } from './types/difficultyType';
 import { CategoryType } from './types/categoryType';
+import { ObstacleType } from './types/obstacleType';
 import { Timer } from './types/timerType';
+import ObstaclesModal from './components/ObstacleModal';
 
 const cardFlip = new Audio('/sounds/cardFlip.mp3');
 const easyMediumBackground = new Audio('/sounds/easyMediumBackground.mp3');
@@ -34,8 +36,13 @@ function App() {
   const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth);
   const [category, setCategory] = useState<CategoryType | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(true);
+  const [obstacle, setObstacle] = useState<ObstacleType | null>(null);
+  const [showObstacleModal, setShowObstacleModal] = useState<boolean>(false);
+  const [obstacleChosen, setObstacleChosen] = useState<boolean>(false);
   const [showHint, setShowHint] = useState<boolean>(false);
   const [hintUsed, setHintUsed] = useState<boolean>(false);
+  const [randomIndices, setRandomIndices] = useState<number[]>([]);
+  const [mistakes, setMistakes] = useState<number>(0);
   const [cardFlipAudio] = useState<HTMLAudioElement>(cardFlip);
   const [easyMediumBackgroundAudio] = useState<HTMLAudioElement>(easyMediumBackground);
   const [hardExtremeBackgroundAudio] = useState<HTMLAudioElement>(hardExtremeBackground);
@@ -46,24 +53,37 @@ function App() {
       medium: { key: 'medium', cardsCount: 16 },
       hard: { key: 'hard', cardsCount: 20 },
       extreme: { key: 'extreme', cardsCount: 20 },
+      obstacles: { key: 'obstacles', cardsCount: 20 },      
     }),
     []
   );
 
   const categories: CategoryType[] = ['Web Development', 'Databases', 'Programming Languages', 'Programming Tools'];
+  const obstacles: ObstacleType[] = ['Time Bomb', 'Nuke', 'Blindfold', 'Quizzle'];
 
   const [setBadge, clearBadge] = useAppBadge();
 
-  const handleClick = useCallback((card: CardType) => {
-    if (gameOver) {
-      return;
-    }
-
-    if (!disabled) {
-      pickOne ? setPickTwo(card as CardType) : setPickOne(card as CardType);
-      cardFlipAudio.play();
-    }
-  }, [gameOver, disabled, pickOne, cardFlipAudio]);
+  const handleClick = useCallback(
+    (card: CardType) => {
+      if (gameOver) {
+        return;
+      }
+  
+      if (!disabled) {
+        if (
+          difficulty?.key === "obstacles" &&
+          obstacle === "Time Bomb" &&
+          !pickOne
+        ) {
+          setMistakes((prevMistakes) => prevMistakes + 1);
+        }
+  
+        pickOne ? setPickTwo(card as CardType) : setPickOne(card as CardType);
+        cardFlipAudio.play();
+      }
+    },
+    [gameOver, disabled, pickOne, cardFlipAudio, difficulty, obstacle]
+  );  
 
   const handleTimer = useCallback(() => {
     setTimer((prevTimer) => prevTimer - 1);
@@ -74,7 +94,15 @@ function App() {
     setPickTwo(null);
     setDisabled(false);
     setShowHint(false);
-  }, []);
+  
+    if (
+      difficulty?.key === "obstacles" &&
+      obstacle === "Time Bomb" &&
+      (mistakes + 1) % 3 === 0
+    ) {
+      setTimer((prevTimer) => prevTimer - 3);
+    }
+  }, [difficulty, obstacle, mistakes]);  
 
   const handleNewGame = useCallback(() => {
     setWins(0);
@@ -82,6 +110,7 @@ function App() {
     setCategory(null);
     setShowCategoryModal(true);
     setShowDifficultyModal(true);
+    setShowObstacleModal(false);
     setCards([]);
     setShowHint(true);
     setHintUsed(false);
@@ -89,6 +118,7 @@ function App() {
     setTimer(60);
     setGameOver(false);
     clearBadge();
+    setObstacleChosen(false);
     easyMediumBackgroundAudio.pause();
     easyMediumBackgroundAudio.currentTime = 0;
     hardExtremeBackgroundAudio.pause();
@@ -96,22 +126,29 @@ function App() {
   }, [handleTurn, clearBadge, easyMediumBackgroundAudio, hardExtremeBackgroundAudio]);
 
   const handleDifficultyChange = useCallback((newDifficulty: DifficultyType) => {
-    console.log(typeof newDifficulty);
     setDifficulty(newDifficulty);
-    console.log(typeof difficulty);
-    
     setShowDifficultyModal(false);
-
+  
     if (newDifficulty.key === "extreme") {
       setTimer(60);
       setGameOver(false);
     }
-  }, [difficulty]);
+  
+    if (newDifficulty.key === "obstacles") {
+      setShowObstacleModal(true);
+    }
+  }, []);
 
   const handleCategoryChange = useCallback((newCategory: CategoryType) => {
     setCategory(newCategory);
     setShowCategoryModal(false);
   }, []);
+
+  const handleObstacleChange = useCallback((newObstacle: ObstacleType) => {
+    setObstacle(newObstacle);
+    setShowObstacleModal(false);
+    setObstacleChosen(true);
+  }, []);  
 
   const toggleHint = useCallback(() => {
     if (!hintUsed) {
@@ -119,6 +156,20 @@ function App() {
       setHintUsed(true);
     }
   }, [hintUsed]);
+
+  const generateRandomIndices = (range: number, count: number) => {
+    const randomIndices: number[] = [];
+    
+    while (randomIndices.length < count) {
+      const randomIndex = Math.floor(Math.random() * range);
+      
+      if (!randomIndices.includes(randomIndex)) {
+        randomIndices.push(randomIndex);
+      }
+    }
+    
+    return randomIndices;
+  };
 
   useEffect(() => {
     if (showHint) {
@@ -162,8 +213,8 @@ function App() {
   }, [difficulties, difficulty, category, setShowDifficultyModal, easyMediumBackgroundAudio, hardExtremeBackgroundAudio]);  
   
   useEffect(() => {
-    let intervalId: Timer;
-
+    let intervalId: Timer | undefined;
+  
     if (difficulty?.key === "extreme" && !gameOver) {
       intervalId = setInterval(() => {
         if (timer > 0) {
@@ -174,11 +225,26 @@ function App() {
         }
       }, 1000);
     }
-
+  
+    if (
+      difficulty?.key === "obstacles" &&
+      obstacleChosen && 
+      !gameOver
+    ) {
+      intervalId = setInterval(() => {
+        if (timer > 0) {
+          handleTimer();
+        } else {
+          setGameOver(true);
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    }
+  
     return () => {
       clearInterval(intervalId);
     };
-  }, [difficulty, gameOver, handleTimer, timer]);
+  }, [difficulty, gameOver, handleTimer, timer, obstacle, obstacleChosen]);  
 
   useEffect(() => {
     let pickTimer: Timer;
@@ -241,6 +307,13 @@ function App() {
     };
   }, [difficulty, hardExtremeBackgroundAudio]);
 
+  useEffect(() => {
+    if (category && difficulty?.key === "obstacles" && obstacleChosen && obstacle === "Blindfold") {
+      const generatedIndices = generateRandomIndices(cards.length, 4);
+      setRandomIndices(generatedIndices);
+    }
+  }, [category, difficulty, obstacleChosen, obstacle, cards.length]);  
+
   return (
     <div className="main-body">
       {showCategoryModal && (
@@ -256,10 +329,13 @@ function App() {
             toggleHint={toggleHint}
             hintUsed={hintUsed}
           />
-          {!gameOver && difficulty?.key === "extreme" && (
+          {category && difficulty?.key === "obstacles" && showObstacleModal && (
+            <ObstaclesModal obstacles={obstacles} onObstacleChange={handleObstacleChange} />
+          )}
+          {!gameOver && (difficulty?.key === "extreme" || (difficulty?.key === "obstacles" && obstacleChosen)) && (
             <div className="timer">
               <h3 className="timer-header">
-                Time Remaining:  <span className="seconds"> {timer} </span> seconds
+                Time Remaining: <span className="seconds"> {timer} </span> seconds
               </h3>
             </div>
           )}
@@ -269,21 +345,40 @@ function App() {
               <p className="extreme-text">You failed the EXTREME level.</p>
             </div>
           )}
-          <div className={`grid ${difficulty?.key}`}>
-            {cards.map((card) => {
-              const { image, matched } = card;
+          {category && difficulty?.key === "obstacles" && obstacleChosen && (
+            <div className={`grid ${difficulty?.key}`}>
+              {cards.map((card, index: number) => {
+                const { image, matched } = card;
 
-              return (
-                <Card
-                  key={card.id}
-                  image={image}
-                  onClick={() => handleClick(card)}
-                  selected={card === pickOne || card === pickTwo || matched}
-                  className={gameOver && difficulty?.key === "extreme" ? "disabled" : ""}
-                />
-              );              
-            })}
-          </div>
+                return (
+                  <Card
+                    key={card.id}
+                    image={image}
+                    onClick={() => handleClick(card)}
+                    selected={card === pickOne || card === pickTwo || matched}
+                    blindfolded={randomIndices.includes(index)}
+                  />
+                );                
+              })}
+            </div>
+          )}
+          {category && difficulty?.key !== "obstacles" && (
+            <div className={`grid ${difficulty?.key}`}>
+              {cards.map((card) => {
+                const { image, matched } = card;
+  
+                return (
+                  <Card
+                    key={card.id}
+                    image={image}
+                    onClick={() => handleClick(card)}
+                    selected={card === pickOne || card === pickTwo || matched}
+                    blindfolded={false}
+                  />
+                );
+              })}
+            </div>
+          )}
           {showDifficultyModal && (
             <DifficultyModal
               difficulties={difficulties}
@@ -294,7 +389,7 @@ function App() {
         </>
       )}
     </div>
-  );
+  );    
 }
 
 export default App;

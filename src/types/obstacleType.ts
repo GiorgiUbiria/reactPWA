@@ -1,0 +1,1 @@
+export type ObstacleType = "Time Bomb" | "Nuke" | "Blindfold" | "Quizzle";
