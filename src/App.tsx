@@ -43,6 +43,9 @@ function App() {
   const [hintUsed, setHintUsed] = useState<boolean>(false);
   const [randomIndices, setRandomIndices] = useState<number[]>([]);
   const [mistakes, setMistakes] = useState<number>(0);
+
+  const [nukePair, setNukePair] = useState<CardType | null>(null);
+
   const [cardFlipAudio] = useState<HTMLAudioElement>(cardFlip);
   const [easyMediumBackgroundAudio] = useState<HTMLAudioElement>(easyMediumBackground);
   const [hardExtremeBackgroundAudio] = useState<HTMLAudioElement>(hardExtremeBackground);
@@ -77,13 +80,26 @@ function App() {
         ) {
           setMistakes((prevMistakes) => prevMistakes + 1);
         }
+          
+        if (difficulty?.key === "obstacles" && obstacle === "Nuke") {
+          if (nukePair === null) {
+            console.log("Moxda 1");
+            
+            const randomIndex = Math.floor(Math.random() * cards.length);
+            const randomCard = cards[randomIndex];
   
-        pickOne ? setPickTwo(card as CardType) : setPickOne(card as CardType);
+            setNukePair({ ...randomCard, id: Math.random(), matched: false });
+          }
+          console.log(nukePair);
+        }
+  
+        pickOne ? setPickTwo(card) : setPickOne(card);
         cardFlipAudio.play();
       }
     },
-    [gameOver, disabled, pickOne, cardFlipAudio, difficulty, obstacle]
-  );  
+    [gameOver, disabled, difficulty?.key, obstacle, pickOne, cardFlipAudio, nukePair, cards]
+  );
+    
 
   const handleTimer = useCallback(() => {
     setTimer((prevTimer) => prevTimer - 1);
@@ -102,7 +118,28 @@ function App() {
     ) {
       setTimer((prevTimer) => prevTimer - 3);
     }
-  }, [difficulty, obstacle, mistakes]);  
+  
+    if (
+      difficulty?.key === "obstacles" &&
+      obstacle === "Nuke" &&
+      nukePair &&
+      pickOne &&
+      pickTwo &&
+      pickOne.image === pickTwo.image &&
+      pickOne.image === nukePair.image
+    ) {
+      const unmatchedPairs = cards.filter((card) => !card.matched);
+      console.log(unmatchedPairs);
+      
+      const isLastPair = unmatchedPairs.length === 2 && unmatchedPairs[0].id === unmatchedPairs[1].id;
+      
+      if (!isLastPair) {
+        console.log("Moxda");
+        
+        setTimer((prevTimer) => prevTimer / 2);
+      }
+    }
+  }, [difficulty, obstacle, mistakes, nukePair, pickOne, pickTwo, cards]);     
 
   const handleNewGame = useCallback(() => {
     setWins(0);
@@ -135,6 +172,8 @@ function App() {
     }
   
     if (newDifficulty.key === "obstacles") {
+      setTimer(90);
+      setGameOver(false);
       setShowObstacleModal(true);
     }
   }, []);
@@ -339,7 +378,7 @@ function App() {
               </h3>
             </div>
           )}
-          {gameOver && difficulty?.key === "extreme" && (
+          {gameOver && (difficulty?.key === "extreme" || (difficulty?.key === "obstacles"))  && (
             <div className="extreme-popup">
               <h2 className="extreme-warning">Game Over!</h2>
               <p className="extreme-text">You failed the EXTREME level.</p>
