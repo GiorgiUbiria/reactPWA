@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 
 const Card = lazy(() => import('./components/Card'));
-import Header from './components/Header';
-import DifficultyModal from './components/DifficultyModal';
-import CategoryModal from './components/CategoryModal';
-import ObstaclesModal from './components/ObstacleModal';
-import QuizModal from './components/QuizModal';
+const Header = lazy(() => import('./components/Header'));
+const DifficultyModal = lazy(() => import('./components/DifficultyModal'));
+const CategoryModal = lazy(() => import('./components/CategoryModal'));
+const ObstaclesModal = lazy(() => import('./components/ObstacleModal'));
+const QuizModal = lazy(() => import('./components/QuizModal'));
 
 import shuffle from './utilities/shuffle';
 import useAppBadge from './hooks/useAppBadge';
@@ -403,21 +403,27 @@ function App() {
   return (
     <div className="main-body">
       {showCategoryModal && (
-        <CategoryModal categories={categories} onCategoryChange={handleCategoryChange} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <CategoryModal categories={categories} onCategoryChange={handleCategoryChange} />
+        </Suspense>
       )}
       {category && (
         <>
-          <Header
-            handleNewGame={handleNewGame}
-            wins={wins}
-            difficulty={difficulty?.key as string}
-            showHint={showHint}
-            toggleHint={toggleHint}
-            hintUsed={hintUsed}
-            obstacle={obstacle ? obstacle as string : null}
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Header
+              handleNewGame={handleNewGame}
+              wins={wins}
+              difficulty={difficulty?.key as string}
+              showHint={showHint}
+              toggleHint={toggleHint}
+              hintUsed={hintUsed}
+              obstacle={obstacle ? obstacle as string : null}
+            />   
+          </Suspense>
           {category && difficulty?.key === 'obstacles' && showObstacleModal && (
-            <ObstaclesModal obstacles={obstacles} onObstacleChange={handleObstacleChange} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <ObstaclesModal obstacles={obstacles} onObstacleChange={handleObstacleChange} />
+            </Suspense>
           )}
           {!gameOver && (difficulty?.key === 'extreme' || (difficulty?.key === 'obstacles' && obstacleChosen)) && (
             <div className="timer">
@@ -472,11 +478,13 @@ function App() {
             </div>
           )}
           {showDifficultyModal && (
-            <DifficultyModal
-              difficulties={difficulties}
-              onDifficultyChange={handleDifficultyChange}
-              screenWidth={screenWidth}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <DifficultyModal
+                difficulties={difficulties}
+                onDifficultyChange={handleDifficultyChange}
+                screenWidth={screenWidth}
+              />
+            </Suspense>
           )}
         </>
       )}
