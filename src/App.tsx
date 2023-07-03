@@ -431,6 +431,7 @@ function App() {
               <p className="extreme-text">You failed the EXTREME level.</p>
             </div>
           )}
+          {showQuizModal && <QuizModal setAnswer={setUserAnswer} currentQuestionIndex={currentQuestion} />}
           {category && difficulty?.key === 'obstacles' && obstacleChosen && (
             <div className={`grid ${difficulty?.key}`}>
               {cards.map((card, index: number) => {
@@ -472,7 +473,6 @@ function App() {
               screenWidth={screenWidth}
             />
           )}
-          {showQuizModal && <QuizModal setAnswer={setUserAnswer} currentQuestionIndex={currentQuestion} />}
         </>
       )}
     </div>
