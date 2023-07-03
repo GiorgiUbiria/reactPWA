@@ -3,6 +3,9 @@ import Card from './components/Card';
 import Header from './components/Header';
 import DifficultyModal from './components/DifficultyModal';
 import CategoryModal from './components/CategoryModal';
+import ObstaclesModal from './components/ObstacleModal';
+import QuizModal from './components/QuizModal';
+
 import shuffle from './utilities/shuffle';
 import useAppBadge from './hooks/useAppBadge';
 
@@ -15,7 +18,11 @@ import { DifficultyType } from './types/difficultyType';
 import { CategoryType } from './types/categoryType';
 import { ObstacleType } from './types/obstacleType';
 import { Timer } from './types/timerType';
-import ObstaclesModal from './components/ObstacleModal';
+
+import { quizQuestions } from './data/quizQuestions';
+import { categories } from './data/categories';
+import { obstacles } from './data/obstacles';
+import { QuizQuestion } from './types/quizQuestionType';
 
 const cardFlip = new Audio('/sounds/cardFlip.mp3');
 const easyMediumBackground = new Audio('/sounds/easyMediumBackground.mp3');
@@ -39,6 +46,12 @@ function App() {
   const [obstacle, setObstacle] = useState<ObstacleType | null>(null);
   const [showObstacleModal, setShowObstacleModal] = useState<boolean>(false);
   const [obstacleChosen, setObstacleChosen] = useState<boolean>(false);
+
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [quizQuantity, setQuizQuantity] = useState<number>(0);
+  const [userAnswer, setUserAnswer] = useState<number>(-1);
+  const [showQuizModal, setShowQuizModal] = useState<boolean>(false);
+
   const [showHint, setShowHint] = useState<boolean>(false);
   const [hintUsed, setHintUsed] = useState<boolean>(false);
   const [randomIndices, setRandomIndices] = useState<number[]>([]);
@@ -61,14 +74,11 @@ function App() {
     []
   );
 
-  const categories: CategoryType[] = ['Web Development', 'Databases', 'Programming Languages', 'Programming Tools'];
-  const obstacles: ObstacleType[] = ['Time Bomb', 'Nuke', 'Blindfold', 'Quizzle'];
-
   const [setBadge, clearBadge] = useAppBadge();
 
   const handleClick = useCallback(
     (card: CardType) => {
-      if (gameOver) {
+      if (gameOver || showQuizModal) {
         return;
       }
   
@@ -97,10 +107,9 @@ function App() {
         cardFlipAudio.play();
       }
     },
-    [gameOver, disabled, difficulty?.key, obstacle, pickOne, cardFlipAudio, nukePair, cards]
+    [gameOver, showQuizModal, disabled, difficulty?.key, obstacle, pickOne, cardFlipAudio, nukePair, cards]
   );
-    
-
+  
   const handleTimer = useCallback(() => {
     setTimer((prevTimer) => prevTimer - 1);
   }, []);
@@ -139,7 +148,7 @@ function App() {
         setTimer((prevTimer) => prevTimer / 2);
       }
     }
-  }, [difficulty, obstacle, mistakes, nukePair, pickOne, pickTwo, cards]);     
+  }, [difficulty?.key, obstacle, mistakes, nukePair, pickOne, pickTwo, cards]);     
 
   const handleNewGame = useCallback(() => {
     setWins(0);
@@ -148,6 +157,8 @@ function App() {
     setShowCategoryModal(true);
     setShowDifficultyModal(true);
     setShowObstacleModal(false);
+    setShowQuizModal(false);
+    setQuizQuantity(0);
     setCards([]);
     setShowHint(true);
     setHintUsed(false);
@@ -187,7 +198,21 @@ function App() {
     setObstacle(newObstacle);
     setShowObstacleModal(false);
     setObstacleChosen(true);
-  }, []);  
+  }, []);
+
+  const handleAnswerCheck = useCallback(() => {
+    if (quizQuestions[currentQuestion].correctAnswer === userAnswer) {
+      setTimer((prevTimer) => prevTimer + 15);
+      setUserAnswer(-1);
+      setShowQuizModal(false);
+    } else {
+      setTimer((prevTimer) => Math.max(0, prevTimer - 15));
+      setUserAnswer(-1);
+      setShowQuizModal(false);
+    }
+    setShowQuizModal(false);
+    setUserAnswer(-1);
+  }, [currentQuestion, userAnswer]);
 
   const toggleHint = useCallback(() => {
     if (!hintUsed) {
@@ -208,6 +233,16 @@ function App() {
     }
     
     return randomIndices;
+  };
+
+  const getRandomQuestionByCategory = useCallback((category: CategoryType) => {
+    const categoryQuestions = quizQuestions.filter((question) => question.category === category);
+    const randomIndex = Math.floor(Math.random() * categoryQuestions.length);
+    return getIndexByField(quizQuestions, "question", categoryQuestions[randomIndex].question);
+  }, []);
+
+  const getIndexByField = (array: QuizQuestion[], field: string, fieldValue: string) => {
+    return array.findIndex((element: QuizQuestion) => element[field] === fieldValue);
   };
 
   useEffect(() => {
@@ -265,26 +300,39 @@ function App() {
       }, 1000);
     }
   
-    if (
-      difficulty?.key === "obstacles" &&
-      obstacleChosen && 
-      !gameOver
-    ) {
-      intervalId = setInterval(() => {
-        if (timer > 0) {
-          handleTimer();
+    if (difficulty?.key === "obstacles" && obstacleChosen && !gameOver) {
+      if (quizQuantity === 0 && timer <= 45 && obstacle === "Quizzle" && userAnswer === -1) {
+        setShowQuizModal(true);
+        if (category) {
+          const randomQuestion = getRandomQuestionByCategory(category);
+          setCurrentQuestion(randomQuestion);
         } else {
-          setGameOver(true);
-          clearInterval(intervalId);
+          setCurrentQuestion(Math.floor(Math.random() * quizQuestions.length));
         }
-      }, 1000);
+        setQuizQuantity((quizQuantity) => quizQuantity + 1);
+        clearInterval(intervalId);
+      } else {
+        if (userAnswer !== -1) {
+          handleAnswerCheck();
+        }
+  
+        intervalId = setInterval(() => {
+          if (timer > 0 && !showQuizModal) {
+            handleTimer();
+          } else if (showQuizModal) {
+            clearInterval(intervalId);
+          } else if (timer <= 0) {
+            setGameOver(true);
+          }
+        }, 1000);
+      }
     }
   
     return () => {
       clearInterval(intervalId);
     };
-  }, [difficulty, gameOver, handleTimer, timer, obstacle, obstacleChosen]);  
-
+  }, [difficulty, gameOver, handleTimer, timer, obstacle, obstacleChosen, userAnswer, handleAnswerCheck, quizQuantity, showQuizModal, category, getRandomQuestionByCategory]);  
+  
   useEffect(() => {
     let pickTimer: Timer;
 
@@ -384,6 +432,7 @@ function App() {
               <p className="extreme-text">You failed the EXTREME level.</p>
             </div>
           )}
+          {showQuizModal && <QuizModal setAnswer={setUserAnswer} currentQuestionIndex={currentQuestion} />}
           {category && difficulty?.key === "obstacles" && obstacleChosen && (
             <div className={`grid ${difficulty?.key}`}>
               {cards.map((card, index: number) => {
@@ -397,7 +446,7 @@ function App() {
                     selected={card === pickOne || card === pickTwo || matched}
                     blindfolded={randomIndices.includes(index)}
                   />
-                );                
+                );                  
               })}
             </div>
           )}
