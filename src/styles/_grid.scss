@@ -1,0 +1,21 @@
+.grid {
+  gap: 1.25rem;
+  display: grid;
+  margin: 3rem auto;
+
+  &.easy {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &.medium {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  &.hard,
+  &.extreme,
+  &.obstacles {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin: 3rem auto 1.5rem auto;
+  }
+}

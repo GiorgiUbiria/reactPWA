@@ -1,0 +1,79 @@
+
+body {
+  height: 100vh;
+  width: 100vw;
+  padding: 1rem;
+  display: flex;
+  overflow: auto;
+  color: $text;
+  background: $bg;
+  align-items: flex-start;
+  justify-content: center;
+  font-family: $font-family;
+}
+
+header {
+  width: 50%;
+  height: 4rem;
+  display: flex;
+  padding: 0.5rem;
+  align-items: center;
+  background: $card;
+  box-shadow: $shadow;
+  border-radius: $radius;
+  animation: $card-enter;
+  justify-content: space-evenly;
+}
+
+h3 {
+  margin: auto;
+  color: $text;
+}
+
+h4 {
+  margin: auto;
+  color: $orange;
+}
+
+button {
+  border: none;
+  outline: none;
+  padding: 0.5rem;
+  border-radius: 3px;
+  margin: auto;
+}
+
+.new-game-btn {
+  cursor: pointer;
+
+  &:hover {
+    scale: 1.03;
+  }
+}
+
+.main-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+}
+
+.mobile-message {
+  display: none;
+  font-size: 12px;
+  color: yellow;
+  margin-top: 5px;
+}
+
+.timer {
+  margin-top: 2.5rem;
+  display: flex;
+
+  .timer-header {
+    color: white;
+  }
+
+  .seconds {
+    color: blue;
+  }
+}
