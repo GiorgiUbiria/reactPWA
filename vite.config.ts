@@ -8,7 +8,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
   manifest: {
     name: 'Programming Memory Game',
     short_name: 'Programming Memory Game',
-    description: 'A fun memory game for programming enthusiasts',
+    description: 'A fun memory game for programming enthusiasts.',
     icons: [
       {
         src: 'main-logo.ico',
