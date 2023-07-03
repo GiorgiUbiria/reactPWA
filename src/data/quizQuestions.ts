@@ -2,7 +2,6 @@ import { QuizQuestion } from "../types/quizQuestionType";
 import { categories } from "./categories";
 
 export const quizQuestions: QuizQuestion[] = [
-  // Web Development
   {
     question: 'What does HTML stand for?',
     options: ['HyperText Markup Language', 'Hyperlink Text Markup Language', 'Highly Textual Markup Language'],
@@ -21,7 +20,18 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     category: categories[0],
   },
-  // Databases
+  {
+    question: 'What is the purpose of CSS in web development?',
+    options: ['To style the appearance of web pages', 'To define the structure of web pages', 'To handle server-side logic'],
+    correctAnswer: 0,
+    category: categories[0],
+  },
+  {
+    question: 'Which HTML element is used to define a hyperlink?',
+    options: ['&lt;a&gt;', '&lt;p&gt;', '&lt;div&gt;'],
+    correctAnswer: 0,
+    category: categories[0],
+  },
   {
     question: 'Which database management system is based on the SQL language?',
     options: ['MySQL', 'MongoDB', 'Redis'],
@@ -40,7 +50,18 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     category: categories[1],
   },
-  // Programming Languages
+  {
+    question: 'What is the primary key in a relational database?',
+    options: ['A unique identifier for each row in a table', 'A table that stores primary data', 'A foreign key linking two tables'],
+    correctAnswer: 0,
+    category: categories[1],
+  },
+  {
+    question: 'Which database model is based on a network structure and uses pointers to navigate between records?',
+    options: ['Relational database', 'Hierarchical database', 'Object-oriented database'],
+    correctAnswer: 1,
+    category: categories[1],
+  },
   {
     question: 'Which programming language is known for its use in web development?',
     options: ['Python', 'Java', 'JavaScript'],
@@ -59,7 +80,18 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     category: categories[2],
   },
-  // Programming Tools
+  {
+    question: 'Which programming language is primarily used for Android app development?',
+    options: ['Swift', 'Kotlin', 'Objective-C'],
+    correctAnswer: 1,
+    category: categories[2],
+  },
+  {
+    question: 'What is the main advantage of using a statically typed programming language?',
+    options: ['Faster development process', 'Better memory management', 'Early error detection'],
+    correctAnswer: 2,
+    category: categories[2],
+  },
   {
     question: 'Which code editor is developed by Microsoft?',
     options: ['Visual Studio Code', 'Atom', 'Sublime Text'],
@@ -78,5 +110,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     category: categories[3],
   },
-  // Add more questions in the desired categories
+  {
+    question: 'Which tool is commonly used for unit testing in JavaScript projects?',
+    options: ['Jasmine', 'Mocha', 'Selenium'],
+    correctAnswer: 1,
+    category: categories[3],
+  },
+  {
+    question: 'What is the purpose of a linter in software development?',
+    options: ['To optimize code performance', 'To enforce coding style and catch errors', 'To automatically generate documentation'],
+    correctAnswer: 1,
+    category: categories[3],
+  },
 ];

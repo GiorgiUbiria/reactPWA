@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import Card from './components/Card';
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
+
+const Card = lazy(() => import('./components/Card'));
 import Header from './components/Header';
 import DifficultyModal from './components/DifficultyModal';
 import CategoryModal from './components/CategoryModal';
@@ -438,13 +439,15 @@ function App() {
                 const { image, matched } = card;
 
                 return (
-                  <Card
-                    key={card.id}
-                    image={image}
-                    onClick={() => handleClick(card)}
-                    selected={card === pickOne || card === pickTwo || matched}
-                    blindfolded={obstacle === "Blindfold" ? randomIndices.includes(index) : false}
-                  />
+                  <Suspense fallback={<div>Loading...</div>} key={card.id}>
+                    <Card
+                      key={card.id}
+                      image={image}
+                      onClick={() => handleClick(card)}
+                      selected={card === pickOne || card === pickTwo || matched}
+                      blindfolded={obstacle === "Blindfold" ? randomIndices.includes(index) : false}
+                    />
+                  </Suspense>
                 );                  
               })}
             </div>
@@ -455,13 +458,15 @@ function App() {
                 const { image, matched } = card;
   
                 return (
-                  <Card
-                    key={card.id}
-                    image={image}
-                    onClick={() => handleClick(card)}
-                    selected={card === pickOne || card === pickTwo || matched}
-                    blindfolded={false}
-                  />
+                  <Suspense fallback={<div>Loading...</div>} key={card.id}>
+                    <Card
+                      key={card.id}
+                      image={image}
+                      onClick={() => handleClick(card)}
+                      selected={card === pickOne || card === pickTwo || matched}
+                      blindfolded={false}
+                    />
+                  </Suspense>  
                 );
               })}
             </div>
