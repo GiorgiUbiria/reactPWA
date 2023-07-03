@@ -35,6 +35,20 @@ h4 {
   color: $orange;
 }
 
+ul {
+  display: flex;
+  gap: 1rem;
+}
+
+li {
+  list-style-type: none;
+  width: 100px;
+
+  button {
+    width: 100%;
+  }
+}
+
 button {
   border: none;
   outline: none;

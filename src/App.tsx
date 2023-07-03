@@ -84,17 +84,15 @@ function App() {
   
       if (!disabled) {
         if (
-          difficulty?.key === "obstacles" &&
+          difficulty?.key === 'obstacles' &&
           obstacle === "Time Bomb" &&
           !pickOne
         ) {
           setMistakes((prevMistakes) => prevMistakes + 1);
         }
           
-        if (difficulty?.key === "obstacles" && obstacle === "Nuke") {
+        if (difficulty?.key === 'obstacles' && obstacle === "Nuke") {
           if (nukePair === null) {
-            console.log("Moxda 1");
-            
             const randomIndex = Math.floor(Math.random() * cards.length);
             const randomCard = cards[randomIndex];
   
@@ -121,7 +119,7 @@ function App() {
     setShowHint(false);
   
     if (
-      difficulty?.key === "obstacles" &&
+      difficulty?.key === 'obstacles' &&
       obstacle === "Time Bomb" &&
       (mistakes + 1) % 3 === 0
     ) {
@@ -129,7 +127,7 @@ function App() {
     }
   
     if (
-      difficulty?.key === "obstacles" &&
+      difficulty?.key === 'obstacles' &&
       obstacle === "Nuke" &&
       nukePair &&
       pickOne &&
@@ -177,12 +175,12 @@ function App() {
     setDifficulty(newDifficulty);
     setShowDifficultyModal(false);
   
-    if (newDifficulty.key === "extreme") {
+    if (newDifficulty.key === 'extreme') {
       setTimer(60);
       setGameOver(false);
     }
   
-    if (newDifficulty.key === "obstacles") {
+    if (newDifficulty.key === 'obstacles') {
       setTimer(90);
       setGameOver(false);
       setShowObstacleModal(true);
@@ -289,7 +287,7 @@ function App() {
   useEffect(() => {
     let intervalId: Timer | undefined;
   
-    if (difficulty?.key === "extreme" && !gameOver) {
+    if (difficulty?.key === 'extreme' && !gameOver) {
       intervalId = setInterval(() => {
         if (timer > 0) {
           handleTimer();
@@ -300,7 +298,7 @@ function App() {
       }, 1000);
     }
   
-    if (difficulty?.key === "obstacles" && obstacleChosen && !gameOver) {
+    if (difficulty?.key === 'obstacles' && obstacleChosen && !gameOver) {
       if (quizQuantity === 0 && timer <= 45 && obstacle === "Quizzle" && userAnswer === -1) {
         setShowQuizModal(true);
         if (category) {
@@ -395,7 +393,7 @@ function App() {
   }, [difficulty, hardExtremeBackgroundAudio]);
 
   useEffect(() => {
-    if (category && difficulty?.key === "obstacles" && obstacleChosen && obstacle === "Blindfold") {
+    if (category && difficulty?.key === 'obstacles' && obstacleChosen && obstacle === "Blindfold") {
       const generatedIndices = generateRandomIndices(cards.length, 4);
       setRandomIndices(generatedIndices);
     }
@@ -415,25 +413,25 @@ function App() {
             showHint={showHint}
             toggleHint={toggleHint}
             hintUsed={hintUsed}
+            obstacle={obstacle ? obstacle as string : null}
           />
-          {category && difficulty?.key === "obstacles" && showObstacleModal && (
+          {category && difficulty?.key === 'obstacles' && showObstacleModal && (
             <ObstaclesModal obstacles={obstacles} onObstacleChange={handleObstacleChange} />
           )}
-          {!gameOver && (difficulty?.key === "extreme" || (difficulty?.key === "obstacles" && obstacleChosen)) && (
+          {!gameOver && (difficulty?.key === 'extreme' || (difficulty?.key === 'obstacles' && obstacleChosen)) && (
             <div className="timer">
               <h3 className="timer-header">
                 Time Remaining: <span className="seconds"> {timer} </span> seconds
               </h3>
             </div>
           )}
-          {gameOver && (difficulty?.key === "extreme" || (difficulty?.key === "obstacles"))  && (
+          {gameOver && (difficulty?.key === 'extreme' || (difficulty?.key === 'obstacles'))  && (
             <div className="extreme-popup">
               <h2 className="extreme-warning">Game Over!</h2>
               <p className="extreme-text">You failed the EXTREME level.</p>
             </div>
           )}
-          {showQuizModal && <QuizModal setAnswer={setUserAnswer} currentQuestionIndex={currentQuestion} />}
-          {category && difficulty?.key === "obstacles" && obstacleChosen && (
+          {category && difficulty?.key === 'obstacles' && obstacleChosen && (
             <div className={`grid ${difficulty?.key}`}>
               {cards.map((card, index: number) => {
                 const { image, matched } = card;
@@ -444,13 +442,13 @@ function App() {
                     image={image}
                     onClick={() => handleClick(card)}
                     selected={card === pickOne || card === pickTwo || matched}
-                    blindfolded={randomIndices.includes(index)}
+                    blindfolded={obstacle === "Blindfold" ? randomIndices.includes(index) : false}
                   />
                 );                  
               })}
             </div>
           )}
-          {category && difficulty?.key !== "obstacles" && (
+          {category && difficulty?.key !== 'obstacles' && (
             <div className={`grid ${difficulty?.key}`}>
               {cards.map((card) => {
                 const { image, matched } = card;
@@ -474,6 +472,7 @@ function App() {
               screenWidth={screenWidth}
             />
           )}
+          {showQuizModal && <QuizModal setAnswer={setUserAnswer} currentQuestionIndex={currentQuestion} />}
         </>
       )}
     </div>

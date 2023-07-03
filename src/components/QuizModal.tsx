@@ -31,11 +31,11 @@ const QuizModal: React.FC<QuizModalProps> = ({ setAnswer, currentQuestionIndex }
             {currentQuestion.options.map((option, index) => (
               <li key={index}>
                 <button
+                  className={userAnswer === index ? 'userAnswer' : 'notUserAnswer'}
                   onClick={() => handleOptionClick(index)}
-                  disabled={userAnswer !== -1}
                 >
                   {option}
-                </button>
+                </button> 
               </li>
             ))}
           </ul>

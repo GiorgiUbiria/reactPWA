@@ -9,6 +9,7 @@ interface HeaderProps {
   showHint: boolean;
   toggleHint: () => void;
   hintUsed: boolean;
+  obstacle: string | null;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -18,6 +19,7 @@ const Header: React.FC<HeaderProps> = ({
   showHint,
   toggleHint,
   hintUsed,
+  obstacle
 }) => {
   useEffect(() => {
     document.title = `${wins} wins`;
@@ -29,9 +31,13 @@ const Header: React.FC<HeaderProps> = ({
     <header className="header">
       <h4>{wins} wins</h4>
       <h3>Memory Game</h3>
-      {memoizedDifficulty && <h3>Current difficulty: {memoizedDifficulty}</h3>}
+      {memoizedDifficulty && (
+        <h3>
+          Current difficulty: {memoizedDifficulty} - {memoizedDifficulty === 'obstacles' && obstacle}
+        </h3>
+      )}
       <button onClick={handleNewGame} className='new-game-btn'>New Game</button>
-      {difficulty === "hard" || difficulty === "extreme" ? (
+      {difficulty === 'hard' || difficulty === 'extreme' ? (
         <button
           onClick={toggleHint}
           className={`hint-button ${showHint ? 'active' : ''} ${hintUsed ? 'disabled' : ''}`}
