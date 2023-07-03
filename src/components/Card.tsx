@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 
 interface CardProps {
   image: string;
@@ -23,20 +22,18 @@ const Card: React.FC<CardProps> = ({
           {blindfolded ? (
             <img src="/assets/blindfolded.png" alt="Blindfolded" />
           ) : (
-            <LazyLoadImage
+            <img
               alt="Image"
               src={memoizedImage}
               className="card-image"
-              effect="blur"
             />
           )}
         </div>
         <div className="card-back" onClick={onClick}>
-          <LazyLoadImage
+          <img
             alt=""
             src="/logo.png"
             className="card-image"
-            effect="blur"
           />
         </div>
       </div>
